@@ -14,14 +14,16 @@ def load_user(user_id):
 def create_app():
     app = Flask(__name__)
     
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'sazon_del_boulevard_2026')
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'sazon_del_boulevard_2026_super_segura')
     
-    # Base de datos (SQLite para desarrollo, PostgreSQL en producción)
+    # Base de datos
     if os.getenv('DATABASE_URL'):
         app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
     else:
-        basedir = os.path.abspath(os.path.dirname(__file__))
-        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "../instance/inventario.db")}'
+        # Asegurar que la carpeta instance exista
+        instance_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'instance')
+        os.makedirs(instance_path, exist_ok=True)
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(instance_path, "inventario.db")}'
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
