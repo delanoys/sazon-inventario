@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import os
+from werkzeug.security import generate_password_hash
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -15,10 +16,9 @@ def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'sazon_del_boulevard_2026')
 
-    # === BASE DE DATOS ===
-    database_url = os.getenv('DATABASE_URL')
-    if database_url:
-        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    # Base de datos
+    if os.getenv('DATABASE_URL'):
+        app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
         print("🟢 Usando PostgreSQL en Render")
     else:
         instance_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'instance')
@@ -40,8 +40,45 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(reports_bp)
 
+    # Inicialización automática de usuarios (solo si no existen)
     with app.app_context():
         db.create_all()
-        print("📊 Base de datos conectada")
+        
+        from .models import Usuario
+        
+        # Admin
+        if not Usuario.query.filter_by(username='admin').first():
+            admin = Usuario(
+                username='admin',
+                password=generate_password_hash('123456'),
+                nombre='Administrador',
+                rol='admin'
+            )
+            db.session.add(admin)
+            print("✅ Admin creado en PostgreSQL")
+
+        # Bodega1
+        if not Usuario.query.filter_by(username='bodega1').first():
+            bodega1 = Usuario(
+                username='bodega1',
+                password=generate_password_hash('123456'),
+                nombre='Bodeguero 1',
+                rol='bodeguero'
+            )
+            db.session.add(bodega1)
+            print("✅ Bodega1 creado")
+
+        # Bodega2
+        if not Usuario.query.filter_by(username='bodega2').first():
+            bodega2 = Usuario(
+                username='bodega2',
+                password=generate_password_hash('123456'),
+                nombre='Bodeguero 2',
+                rol='bodeguero'
+            )
+            db.session.add(bodega2)
+            print("✅ Bodega2 creado")
+
+        db.session.commit()
 
     return app
