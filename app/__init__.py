@@ -12,6 +12,45 @@ def load_user(user_id):
     from .models import Usuario
     return Usuario.query.get(int(user_id))
 
+def _seed_users():
+    """Crea usuarios iniciales solo si no existen"""
+    from .models import Usuario
+    
+    # Admin
+    if not Usuario.query.filter_by(username='admin').first():
+        admin = Usuario(
+            username='admin',
+            password=generate_password_hash('123456'),
+            nombre='Administrador',
+            rol='admin'
+        )
+        db.session.add(admin)
+        print("✅ Usuario 'admin' creado")
+
+    # Bodega1
+    if not Usuario.query.filter_by(username='bodega1').first():
+        bodega1 = Usuario(
+            username='bodega1',
+            password=generate_password_hash('123456'),
+            nombre='Bodeguero 1',
+            rol='bodeguero'
+        )
+        db.session.add(bodega1)
+        print("✅ Usuario 'bodega1' creado")
+
+    # Bodega2
+    if not Usuario.query.filter_by(username='bodega2').first():
+        bodega2 = Usuario(
+            username='bodega2',
+            password=generate_password_hash('123456'),
+            nombre='Bodeguero 2',
+            rol='bodeguero'
+        )
+        db.session.add(bodega2)
+        print("✅ Usuario 'bodega2' creado")
+
+    db.session.commit()
+
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'sazon_del_boulevard_2026')
@@ -40,45 +79,9 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(reports_bp)
 
-    # Inicialización automática de usuarios (solo si no existen)
+    # Inicialización
     with app.app_context():
         db.create_all()
-        
-        from .models import Usuario
-        
-        # Admin
-        if not Usuario.query.filter_by(username='admin').first():
-            admin = Usuario(
-                username='admin',
-                password=generate_password_hash('123456'),
-                nombre='Administrador',
-                rol='admin'
-            )
-            db.session.add(admin)
-            print("✅ Admin creado en PostgreSQL")
-
-        # Bodega1
-        if not Usuario.query.filter_by(username='bodega1').first():
-            bodega1 = Usuario(
-                username='bodega1',
-                password=generate_password_hash('123456'),
-                nombre='Bodeguero 1',
-                rol='bodeguero'
-            )
-            db.session.add(bodega1)
-            print("✅ Bodega1 creado")
-
-        # Bodega2
-        if not Usuario.query.filter_by(username='bodega2').first():
-            bodega2 = Usuario(
-                username='bodega2',
-                password=generate_password_hash('123456'),
-                nombre='Bodeguero 2',
-                rol='bodeguero'
-            )
-            db.session.add(bodega2)
-            print("✅ Bodega2 creado")
-
-        db.session.commit()
+        _seed_users()          # ← Crea usuarios solo si no existen
 
     return app
