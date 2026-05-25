@@ -6,13 +6,15 @@ venv/
 # Base de datos
 instance/*.db
 *.db
+*.sqlite3
 
-# Archivos con secretos
-*.txt
-desplegar*
-tokens*
-secrets*
-
-# Python
+# Archivos temporales
 __pycache__/
 *.pyc
+*.pyo
+
+# Archivos sensibles
+*.txt
+desplegar*
+secrets*
+tokens*
