@@ -14,13 +14,12 @@ def load_user(user_id):
 def create_app():
     app = Flask(__name__)
     
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'sazon_del_boulevard_2026_super_segura')
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'sazon_del_boulevard_2026')
     
     # Base de datos
     if os.getenv('DATABASE_URL'):
         app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
     else:
-        # Asegurar que la carpeta instance exista
         instance_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'instance')
         os.makedirs(instance_path, exist_ok=True)
         app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(instance_path, "inventario.db")}'
@@ -39,7 +38,21 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(reports_bp)
     
+    # Inicialización automática (solo la primera vez)
     with app.app_context():
         db.create_all()
+        
+        # Crear usuario admin si no existe
+        from .models import Usuario
+        if not Usuario.query.filter_by(username='admin').first():
+            admin = Usuario(
+                username='admin',
+                password='123456',
+                nombre='Administrador',
+                rol='admin'
+            )
+            db.session.add(admin)
+            db.session.commit()
+            print("✅ Usuario admin creado automáticamente")
     
     return app
