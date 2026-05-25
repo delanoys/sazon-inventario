@@ -11,24 +11,25 @@ with app.app_context():
         admin = Usuario(
             username='admin',
             password='123456',
-            nombre='Administrador Principal',
+            nombre='Administrador',
             rol='admin'
         )
         db.session.add(admin)
-        print("✅ Usuario admin creado")
+        print("✅ Usuario 'admin' creado exitosamente")
     else:
         print("✅ Usuario admin ya existía")
     
-    # Crear algunos productos de ejemplo
+    # Crear productos de ejemplo
     if Producto.query.count() == 0:
         productos = [
             Producto(nombre="Arroz", unidad="kg", stock_actual=50, stock_minimo=10),
             Producto(nombre="Pollo", unidad="kg", stock_actual=30, stock_minimo=8),
             Producto(nombre="Papa", unidad="kg", stock_actual=40, stock_minimo=10),
             Producto(nombre="Aceite", unidad="litros", stock_actual=20, stock_minimo=5),
+            Producto(nombre="Tomate", unidad="kg", stock_actual=25, stock_minimo=5),
         ]
         db.session.bulk_save_objects(productos)
         print("✅ Productos de ejemplo creados")
     
     db.session.commit()
-    print("✅ Base de datos inicializada correctamente")
+    print("✅ Base de datos inicializada correctamente en PostgreSQL")
