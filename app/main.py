@@ -16,6 +16,11 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# ====================== RUTA PRINCIPAL ======================
+@main_bp.route('/')
+def index():
+    return redirect(url_for('auth.login'))
+
 # ====================== DASHBOARD ======================
 @main_bp.route('/dashboard')
 @login_required
@@ -23,7 +28,7 @@ def dashboard():
     productos_bajos = Producto.query.filter(Producto.stock_actual < Producto.stock_minimo).count()
     productos_bajos_list = Producto.query.filter(Producto.stock_actual < Producto.stock_minimo).all()
     total_productos = Producto.query.count()
-    return render_template('dashboard.html', 
+    return render_template('dashboard.html',
                          productos_bajos=productos_bajos,
                          productos_bajos_list=productos_bajos_list,
                          total_productos=total_productos)
@@ -71,19 +76,18 @@ def eliminar_producto(id):
     flash(f'Producto "{nombre}" eliminado correctamente', 'danger')
     return redirect(url_for('main.productos'))
 
-# ====================== ENTRADA Y CONSUMO (TODOS) ======================
+# ====================== ENTRADA Y CONSUMO ======================
 @main_bp.route('/registrar_entrada', methods=['GET', 'POST'])
 @login_required
 def registrar_entrada():
-    # ... (mantengo la lógica anterior)
     productos = Producto.query.all()
     if request.method == 'POST':
         nombre = request.form.get('nombre', '').strip()
         cantidad = float(request.form.get('cantidad', 0))
         stock_minimo = float(request.form.get('stock_minimo', 5))
-        
+       
         producto = Producto.query.filter(Producto.nombre.ilike(nombre)).first()
-        
+       
         if producto:
             producto.stock_actual += cantidad
             if stock_minimo != producto.stock_minimo:
@@ -98,10 +102,10 @@ def registrar_entrada():
             else:
                 flash('Datos incompletos', 'danger')
                 return redirect(url_for('main.registrar_entrada'))
-        
+       
         db.session.commit()
         return redirect(url_for('main.dashboard'))
-    
+   
     return render_template('registrar_entrada.html', productos=productos)
 
 @main_bp.route('/registrar_consumo', methods=['GET', 'POST'])
@@ -112,7 +116,7 @@ def registrar_consumo():
         producto_id = request.form.get('producto_id')
         cantidad = float(request.form.get('cantidad'))
         observacion = request.form.get('observacion')
-        
+       
         producto = Producto.query.get(producto_id)
         if producto and cantidad > 0:
             if producto.stock_actual < cantidad:
