@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4" style="color: #8B4513;">
+    <i class="fas fa-chart-bar"></i> Reportes Básicos de Inventario
+</h2>
+
+<div class="row">
+    <!-- Stock Actual -->
+    <div class="col-12 col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5>📦 Stock Actual</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Unidad</th>
+                            <th>Stock Actual</th>
+                            <th>Stock Mínimo</th>
+                            <th>Consumo Total</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in productos %}
+                        <tr>
+                            <td><strong>{{ p.nombre }}</strong></td>
+                            <td>{{ p.unidad }}</td>
+                            <td class="fw-bold">{{ p.stock_actual }}</td>
+                            <td>{{ p.stock_minimo }}</td>
+                            <td class="text-danger">{{ consumo_dict.get(p.id, 0) }}</td>
+                            <td>
+                                {% if p.stock_actual < p.stock_minimo and p.stock_actual > 0 %}<span class="badge bg-danger">Bajo</span>
+                                {% elif p.stock_actual == 0 %}<span class="badge bg-warning">Sin stock</span>
+                                {% else %}<span class="badge bg-success">Normal</span>{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Últimos Consumos -->
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h5>📋 Últimos Consumos Registrados</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Observación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in ultimos_consumos %}
+                        <tr>
+                            <td>{{ t.fecha_hora.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>{{ t.producto.nombre }}</td>
+                            <td>{{ t.cantidad }} {{ t.producto.unidad }}</td>
+                            <td>{{ t.observacion or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

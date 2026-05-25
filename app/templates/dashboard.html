@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4">Dashboard - El Sazón del Boulevard</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-center border-danger">
+            <div class="card-body">
+                <h5>Productos con Stock Bajo</h5>
+                <h2 class="text-danger">{{ productos_bajos }}</h2>
+                <p class="text-muted">Necesitan reponer</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Total Productos</h5>
+                <h2>{{ total_productos }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mt-5">Productos que necesitan atención</h4>
+<table class="table table-striped">
+    <thead class="table-danger">
+        <tr>
+            <th>Producto</th>
+            <th>Stock Actual</th>
+            <th>Stock Mínimo</th>
+            <th>Falta</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in productos_bajos_list %}
+        <tr>
+            <td><strong>{{ p.nombre }}</strong></td>
+            <td>{{ p.stock_actual }} {{ p.unidad }}</td>
+            <td>{{ p.stock_minimo }}</td>
+            <td class="text-danger">{{ p.stock_minimo - p.stock_actual }} {{ p.unidad }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

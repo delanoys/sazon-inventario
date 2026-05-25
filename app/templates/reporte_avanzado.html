@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4" style="color: #8B4513;">
+    <i class="fas fa-chart-line"></i> Reporte Avanzado de Inventario
+</h2>
+
+<!-- Filtros -->
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Fecha Inicio</label>
+                <input type="date" class="form-control" name="fecha_inicio" value="{{ fecha_inicio }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Fecha Fin</label>
+                <input type="date" class="form-control" name="fecha_fin" value="{{ fecha_fin }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Tipo de Reporte</label>
+                <select class="form-select" name="tipo">
+                    <option value="stock">Stock Actual</option>
+                    <option value="movimientos">Movimientos</option>
+                    <option value="analisis">Análisis Completo</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Generar Reporte</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Stock Actual -->
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                <h5>1. Stock Actual del Inventario</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Unidad</th>
+                            <th>Stock Actual</th>
+                            <th>Stock Mínimo</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in productos %}
+                        <tr>
+                            <td><strong>{{ p.nombre }}</strong></td>
+                            <td>{{ p.unidad }}</td>
+                            <td class="fw-bold">{{ p.stock_actual }}</td>
+                            <td>{{ p.stock_minimo }}</td>
+                            <td>
+                                {% if p.stock_actual < p.stock_minimo and p.stock_actual > 0 %}<span class="badge bg-danger">Bajo</span>
+                                {% elif p.stock_actual == 0 %}<span class="badge bg-warning">Sin stock</span>
+                                {% else %}<span class="badge bg-success">Normal</span>{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráfico de Stock -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5>📊 Análisis Gráfico - Stock por Producto</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="stockChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    new Chart(document.getElementById('stockChart'), {
+        type: 'bar',
+        data: {
+            labels: [{% for p in productos %}"{{ p.nombre }}",{% endfor %}],
+            datasets: [{
+                label: 'Stock Actual',
+                data: [{% for p in productos %}{{ p.stock_actual }},{% endfor %}],
+                backgroundColor: '#A52A2A'
+            }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true }}}
+    });
+</script>
+{% endblock %}
