@@ -1,20 +1,26 @@
 # Entorno virtual
 inventario/
 venv/
-*.env
+env/
 
 # Base de datos
 instance/*.db
 *.db
 *.sqlite3
 
-# Archivos temporales
+# Python
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
 
-# Archivos sensibles
-*.txt
+# Archivos temporales y sensibles
+*.env
 desplegar*
-secrets*
 tokens*
+secrets*
+*.log
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
